@@ -6,6 +6,7 @@ import {
 	Setting,
 	TAbstractFile,
 	TFile,
+	normalizePath,
 } from "obsidian";
 
 interface VaultFileRenamerSettings {
@@ -18,40 +19,37 @@ const DEFAULT_SETTINGS: VaultFileRenamerSettings = {
 
 export default class VaultFileRenamerPlugin extends Plugin {
 	settings!: VaultFileRenamerSettings;
-	// Um conjunto para evitar renomeações duplicadas simultâneas
 	private renamingInProgress: Set<string> = new Set();
 
 	async onload() {
-		console.log("Vault File Renamer Plugin loaded");
 		await this.loadSettings();
 
-		// Renomeia todos os arquivos existentes ao carregar
+		// Rename all existing files on plugin load
 		await this.standardizeAllFiles();
 
-		// Escuta criação de novos arquivos
+		// Listen for new file creation
 		this.registerEvent(
 			this.app.vault.on("create", async (item: TAbstractFile) => {
 				if (item instanceof TFile) {
-					// Delay pequeno para garantir que o arquivo foi criado
+					// Use a small delay to allow the file creation to settle
 					setTimeout(() => this.standardizeFile(item), 50);
 				}
 			})
 		);
 
-		// Escuta eventos de renomeação (edição manual)
+		// Listen for file rename events (manual edits)
 		this.registerEvent(
 			this.app.vault.on(
 				"rename",
 				async (item: TAbstractFile, oldPath: string) => {
 					if (item instanceof TFile) {
-						// Delay para permitir que a renomeação manual seja concluída
 						setTimeout(() => this.standardizeFile(item), 50);
 					}
 				}
 			)
 		);
 
-		// Ribbon icon (opcional)
+		// Ribbon icon (optional)
 		const ribbonIconEl = this.addRibbonIcon(
 			"dice",
 			"Vault File Renamer",
@@ -61,12 +59,12 @@ export default class VaultFileRenamerPlugin extends Plugin {
 		);
 		ribbonIconEl.addClass("vault-file-renamer-ribbon");
 
-		// Aba de configurações
+		// Add settings tab
 		this.addSettingTab(new VaultFileRenamerSettingTab(this.app, this));
 	}
 
 	onunload() {
-		console.log("Vault File Renamer Plugin unloaded");
+		// Resources are cleaned up automatically via registerEvent
 	}
 
 	async standardizeAllFiles() {
@@ -77,20 +75,19 @@ export default class VaultFileRenamerPlugin extends Plugin {
 	}
 
 	async standardizeFile(file: TFile) {
-		// Se já estiver em processo de renomeação, pula
+		// Prevent duplicate renaming operations
 		if (this.renamingInProgress.has(file.path)) return;
 
-		// Gera o novo nome padronizado para o arquivo
+		// Generate a standardized file name
 		const newBaseName = this.generateStandardName(file.name);
 		const folderPath = file.parent ? file.parent.path : "";
-		const newPath = folderPath
-			? `${folderPath}/${newBaseName}`
-			: newBaseName;
+		const newPath = normalizePath(
+			folderPath ? `${folderPath}/${newBaseName}` : newBaseName
+		);
 
-		// Se o nome já estiver padronizado, não faz nada
 		if (file.path === newPath) return;
 
-		// Verifica se já existe um arquivo com esse caminho para evitar duplicatas
+		// Avoid renaming if a file with the new name already exists
 		const existing = this.app.vault.getAbstractFileByPath(newPath);
 		if (existing && existing !== file) {
 			new Notice(
@@ -99,11 +96,9 @@ export default class VaultFileRenamerPlugin extends Plugin {
 			return;
 		}
 
-		// Marca o arquivo como em renomeação
 		this.renamingInProgress.add(file.path);
 		try {
 			await this.app.vault.rename(file, newPath);
-			console.log(`Renamed file to: ${newPath}`);
 		} catch (error) {
 			console.error(`Error renaming file ${file.path}:`, error);
 		} finally {
@@ -112,7 +107,7 @@ export default class VaultFileRenamerPlugin extends Plugin {
 	}
 
 	generateStandardName(originalName: string): string {
-		// Separa a extensão, se houver
+		// Separate the extension (if any) to preserve it
 		const dotIndex = originalName.lastIndexOf(".");
 		let base = originalName;
 		let extension = "";
@@ -121,14 +116,13 @@ export default class VaultFileRenamerPlugin extends Plugin {
 			extension = originalName.substring(dotIndex).toLowerCase();
 		}
 
-		// Converte para minúsculas
+		// Convert to lowercase
 		base = base.toLowerCase();
-		// Remove acentos
+		// Remove accents
 		base = base.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-		// Substitui espaços por traço
+		// Replace spaces with dashes
 		base = base.replace(/\s+/g, "-");
-		// Permite apenas: letras minúsculas, números, traço (-), underline (_) e ponto (.)
-		// Qualquer outro caractere é convertido para traço
+		// Allow only: lowercase letters, numbers, dash (-), underscore (_), and period (.)
 		base = base.replace(/[^a-z0-9\-_.]/g, "-");
 
 		return base + extension;
@@ -159,10 +153,9 @@ class VaultFileRenamerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Vault File Renamer Settings" });
-
+		// According to guidelines, avoid a top-level heading in the settings tab
 		new Setting(containerEl)
-			.setName("Automatic Renaming")
+			.setName("Automatic renaming")
 			.setDesc(
 				"Files are automatically renamed on creation and manual renaming."
 			)
