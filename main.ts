@@ -1,134 +1,138 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {
+  App,
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  TAbstractFile,
+  TFile,
+} from "obsidian";
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
+interface VaultFileRenamerSettings {
+  // Futuras configurações podem ser adicionadas aqui
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+const DEFAULT_SETTINGS: VaultFileRenamerSettings = {
+  // Configurações padrão (nenhuma por enquanto)
+};
+
+export default class VaultFileRenamerPlugin extends Plugin {
+  settings!: VaultFileRenamerSettings;
+
+  async onload() {
+    console.log("Vault File Renamer Plugin loaded");
+    await this.loadSettings();
+
+    // Renomeia todos os arquivos existentes no vault ao carregar o plugin
+    await this.standardizeAllFiles();
+
+    // Monitora a criação de novos arquivos e os renomeia
+    this.registerEvent(
+      this.app.vault.on("create", async (item: TAbstractFile) => {
+        if (item instanceof TFile) {
+          await this.standardizeFile(item);
+        }
+      })
+    );
+
+    // Adiciona um ícone na ribbon (opcional)
+    const ribbonIconEl = this.addRibbonIcon(
+      "dice",
+      "Vault File Renamer",
+      () => {
+        new Notice("Vault File Renamer is active!");
+      }
+    );
+    ribbonIconEl.addClass("vault-file-renamer-ribbon");
+
+    // Adiciona a aba de configurações
+    this.addSettingTab(new VaultFileRenamerSettingTab(this.app, this));
+  }
+
+  onunload() {
+    console.log("Vault File Renamer Plugin unloaded");
+  }
+
+  async standardizeAllFiles() {
+    const files = this.app.vault.getFiles();
+    for (const file of files) {
+      await this.standardizeFile(file);
+    }
+  }
+
+  async standardizeFile(file: TFile) {
+    // Gera o novo nome padrão para o arquivo
+    const newBaseName = this.generateStandardName(file.name);
+    // Verifica se o arquivo tem um pai (pasta) e obtém seu caminho
+    const folderPath = file.parent ? file.parent.path : "";
+    // Reconstrói o novo caminho completo mantendo a localização original
+    const newPath = folderPath ? `${folderPath}/${newBaseName}` : newBaseName;
+
+    if (file.path !== newPath) {
+      try {
+        await this.app.vault.rename(file, newPath);
+        console.log(`Renamed file: ${file.path} -> ${newPath}`);
+      } catch (error) {
+        console.error(`Error renaming file ${file.path}:`, error);
+      }
+    }
+  }
+
+  generateStandardName(originalName: string): string {
+    // Preserva a extensão se houver
+    const dotIndex = originalName.lastIndexOf(".");
+    let base = originalName;
+    let extension = "";
+    if (dotIndex > 0) {
+      base = originalName.substring(0, dotIndex);
+      extension = originalName.substring(dotIndex).toLowerCase();
+    }
+
+    // Converte para minúsculas
+    base = base.toLowerCase();
+    // Remove acentos
+    base = base.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // Substitui espaços por traço
+    base = base.replace(/\s+/g, "-");
+    // Permite apenas: letras minúsculas, números, traço (-), underline (_) e ponto (.)
+    // Se encontrar outro caractere, substitui por traço
+    base = base.replace(/[^a-z0-9\-_.]/g, "-");
+
+    return base + extension;
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+class VaultFileRenamerSettingTab extends PluginSettingTab {
+  plugin: VaultFileRenamerPlugin;
 
-	async onload() {
-		await this.loadSettings();
+  constructor(app: App, plugin: VaultFileRenamerPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+  display(): void {
+    const { containerEl } = this;
+    containerEl.empty();
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+    containerEl.createEl("h2", { text: "Vault File Renamer Settings" });
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+    new Setting(containerEl)
+      .setName("Automatic Renaming")
+      .setDesc(
+        "Files are automatically renamed on creation and on plugin load."
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(true).onChange(async (value: boolean) => {
+          new Notice("Automatic renaming is always enabled in this version.");
+        })
+      );
+  }
 }
