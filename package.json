@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-vault-file-renamer",
+	"name": "vault-file-renamer",
 	"version": "1.0.0",
 	"description": "This plugin standardizes the names of files in your vault by converting them to lowercase, replacing spaces with underscores, and removing accents and unwanted characters.",
 	"main": "main.js",
