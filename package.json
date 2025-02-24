@@ -1,14 +1,14 @@
 {
-  "name": "vault-file-renamer",
-  "version": "1.0.0",
-  "description": "This plugin standardizes the names of files in your vault by converting them to lowercase, replacing spaces with underscores, and removing accents and unwanted characters.",
-  "main": "main.js",
-  "scripts": {
-    "build": "node esbuild.config.mjs",
-    "watch": "node esbuild.config.mjs"
-  },
-  "devDependencies": {
-    "esbuild": "^0.17.0",
-    "builtin-modules": "^3.3.0"
-  }
+	"name": "obsidian-vault-file-renamer",
+	"version": "1.0.0",
+	"description": "This plugin standardizes the names of files in your vault by converting them to lowercase, replacing spaces with underscores, and removing accents and unwanted characters.",
+	"main": "main.js",
+	"scripts": {
+		"build": "node esbuild.config.mjs",
+		"watch": "node esbuild.config.mjs"
+	},
+	"devDependencies": {
+		"esbuild": "^0.17.0",
+		"builtin-modules": "^3.3.0"
+	}
 }
