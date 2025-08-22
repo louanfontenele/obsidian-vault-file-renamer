@@ -11,6 +11,8 @@
     "sourceMap": false
   },
   "include": [
-    "main.ts"
+    "main.ts",
+    "folder-suggest.ts",
+    "file-suggest.ts"
   ]
 }
