@@ -9,6 +9,7 @@ import { App, AbstractInputSuggest } from "obsidian";
 export class FolderSuggest extends AbstractInputSuggest<string> {
 	private folders: string[];
 	private onSelectCb?: (value: string) => void;
+	protected inputEl: HTMLInputElement;
 
 	constructor(
 		app: App,
@@ -16,6 +17,7 @@ export class FolderSuggest extends AbstractInputSuggest<string> {
 		onSelect?: (value: string) => void
 	) {
 		super(app, inputEl);
+		this.inputEl = inputEl;
 		// Include root and all loaded folders.
 		// getAllFolders(includeRoot?: boolean) is available in recent API builds.
 		const vaultFolders = app.vault.getAllFolders(true).map((f) => f.path);

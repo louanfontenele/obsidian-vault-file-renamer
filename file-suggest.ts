@@ -8,6 +8,7 @@ import { App, AbstractInputSuggest } from "obsidian";
 export class FileSuggest extends AbstractInputSuggest<string> {
 	private files: string[];
 	private onSelectCb?: (value: string) => void;
+	protected inputEl: HTMLInputElement;
 
 	constructor(
 		app: App,
@@ -15,6 +16,7 @@ export class FileSuggest extends AbstractInputSuggest<string> {
 		onSelect?: (value: string) => void
 	) {
 		super(app, inputEl);
+		this.inputEl = inputEl;
 		this.files = app.vault.getFiles().map((f) => f.path);
 		this.onSelectCb = onSelect;
 	}

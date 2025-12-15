@@ -1,6 +1,6 @@
 {
 	"name": "vault-file-renamer",
-	"version": "1.1.2",
+	"version": "1.2.0",
 	"description": "Standardizes names in Obsidian: lowercase, accents removed, spaces become hyphens, and invalid characters are converted. Includes toggle, target extensions, excluded extensions, and folder blacklist.",
 	"main": "main.js",
 	"scripts": {
@@ -8,7 +8,8 @@
 		"watch": "node esbuild.config.mjs"
 	},
 	"devDependencies": {
+		"builtin-modules": "^3.3.0",
 		"esbuild": "^0.25.0",
-		"builtin-modules": "^3.3.0"
+		"obsidian": "^1.11.0"
 	}
 }
