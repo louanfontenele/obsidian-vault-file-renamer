@@ -325,17 +325,9 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 		text: string,
 		onDelete: () => void
 	) {
-		const row = parent.createDiv({ cls: "vfr-bl-row" });
-		// CSS should handle flex, but we'll set inline styles to guarantee "Alignment Fix" requested by user
-		row.style.display = "flex";
-		row.style.justifyContent = "space-between";
-		row.style.alignItems = "center";
-		row.style.padding = "4px 8px";
-		row.style.borderBottom = "1px solid var(--background-modifier-border)";
-
-		row.createEl("span", { text: text, cls: "vfr-bl-text" });
-		const btn = row.createEl("button", { text: "Remove" });
-		btn.onclick = onDelete;
+		new Setting(parent)
+			.setName(text)
+			.addButton((btn) => btn.setButtonText("Remove").onClick(onDelete));
 	}
 
 	private async addBlacklistFolder(raw: string, container: HTMLElement) {
