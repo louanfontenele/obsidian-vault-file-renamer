@@ -4,6 +4,7 @@ import {
 	Setting,
 	Notice,
 	normalizePath,
+	SearchComponent,
 } from "obsidian";
 import VaultFileRenamerPlugin from "./main";
 import { FolderSuggest } from "./folder-suggest";
@@ -144,7 +145,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 
 		// Folder
 		const folderBlock = containerEl.createDiv();
-		let folderSearchInput: any = null; // Store reference to access value
+		let folderSearchInput: SearchComponent | null = null; // Store reference to access value
 
 		new Setting(folderBlock)
 			.setName("Add folder to blacklist")
@@ -175,7 +176,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 
 		// File
 		const fileBlock = containerEl.createDiv();
-		let fileSearchInput: any = null;
+		let fileSearchInput: SearchComponent | null = null;
 
 		new Setting(fileBlock)
 			.setName("Add file to blacklist")
@@ -210,33 +211,23 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 
 		this.plugin.settings.rules.forEach((rule, index) => {
 			const row = container.createDiv({ cls: "vfr-rule-row" });
-			row.style.display = "flex";
-			row.style.alignItems = "center";
-			row.style.gap = "10px";
-			row.style.marginBottom = "10px";
-			row.style.padding = "10px";
-			row.style.border = "1px solid var(--background-modifier-border)";
-			row.style.borderRadius = "5px";
 
 			// Active Toggle
-			const toggleDiv = row.createDiv();
+			const toggleDiv = row.createDiv({ cls: "vfr-toggle-compact" });
 			const toggle = new Setting(toggleDiv).addToggle((t) =>
 				t.setValue(rule.active).onChange(async (v) => {
 					rule.active = v;
 					await this.plugin.saveSettings();
 				})
 			);
-			// Remove the empty setting info/name to make it compact
-			toggle.settingEl.style.border = "none";
-			toggle.settingEl.style.padding = "0";
 
 			// Name
 			const nameInput = row.createEl("input", {
 				type: "text",
 				value: rule.name,
+				cls: "vfr-rule-input-name",
 			});
-			nameInput.placeholder = "Rule Name";
-			nameInput.style.width = "120px";
+			nameInput.placeholder = "Rule name";
 			nameInput.onchange = async () => {
 				rule.name = nameInput.value;
 				await this.plugin.saveSettings();
@@ -246,9 +237,9 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 			const patternInput = row.createEl("input", {
 				type: "text",
 				value: rule.pattern,
+				cls: "vfr-rule-input-pattern",
 			});
-			patternInput.placeholder = "Regex Pattern";
-			patternInput.style.flex = "1";
+			patternInput.placeholder = "Regex pattern";
 			patternInput.onchange = async () => {
 				rule.pattern = patternInput.value;
 				await this.plugin.saveSettings();
@@ -261,9 +252,9 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 			const replaceInput = row.createEl("input", {
 				type: "text",
 				value: rule.replace,
+				cls: "vfr-rule-input-replace",
 			});
 			replaceInput.placeholder = "Replacement";
-			replaceInput.style.width = "100px";
 			replaceInput.onchange = async () => {
 				rule.replace = replaceInput.value;
 				await this.plugin.saveSettings();

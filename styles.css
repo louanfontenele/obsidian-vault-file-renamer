@@ -1,8 +1,44 @@
-/*
+/* Vault File Renamer Styles */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.vfr-settings-container {
+	padding-bottom: 20px;
+}
 
-If your plugin does not need CSS, delete this file.
+.vfr-rules-list {
+	margin-bottom: 20px;
+}
 
-*/
+.vfr-rule-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+	padding: 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 5px;
+}
+
+.vfr-rule-row:last-child {
+	margin-bottom: 0;
+}
+
+.vfr-toggle-compact .setting-item {
+	border: none;
+	padding: 0;
+}
+
+.vfr-rule-input-name {
+	width: 120px;
+}
+
+.vfr-rule-input-pattern {
+	flex: 1;
+}
+
+.vfr-rule-input-replace {
+	width: 100px;
+}
+
+.vfr-bl-row {
+	/* Handled by standard obsidian Setting component now, but keeping for legacy or if needed for custom tweaks */
+}
