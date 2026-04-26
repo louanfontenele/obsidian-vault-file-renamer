@@ -11,17 +11,16 @@ export interface VaultFileRenamerSettings {
 	enabled: boolean;
 	/** File extensions to target (without the dot). Empty = all file types. */
 	targetExtensions: string[];
-	/** File extensions that are NEVER renamed. Highest priority (overrides allow-list). */
+	/** File extensions that are never renamed. Highest priority (overrides allow-list). */
 	excludedExtensions: string[];
-	/** Folder paths (relative to the vault) where NOTHING is renamed (recursive). */
+	/** Folder paths (relative to the vault) where nothing is renamed (recursive). */
 	blacklistedFolders: string[];
-	/** File paths (relative to the vault) that are NEVER renamed (exact matches). */
+	/** File paths (relative to the vault) that are never renamed (exact matches). */
 	blacklistedFiles: string[];
 	/** Custom renaming rules applied in order. */
 	rules: RenamingRule[];
-	/** Application of rules case-sensitivity or other flags? For now, we assume global. */
 
-	/** Whether to use the creation date variable {{DATE}} feature (to be implemented). */
+	/** Whether to use the creation date variable {{DATE}} in rule replacements. */
 	useCreationDate: boolean;
 	dateFormat: string;
 }

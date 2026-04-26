@@ -1,6 +1,5 @@
 import {
 	App,
-	Notice,
 	TAbstractFile,
 	TFile,
 	TFolder,
@@ -13,16 +12,10 @@ export class RenamingService {
 	private app: App;
 	private settings: VaultFileRenamerSettings;
 	public renamingInProgress: Set<string> = new Set();
-	private saveSettingsCallback: () => Promise<void>;
 
-	constructor(
-		app: App,
-		settings: VaultFileRenamerSettings,
-		saveSettingsCallback: () => Promise<void>
-	) {
+	constructor(app: App, settings: VaultFileRenamerSettings) {
 		this.app = app;
 		this.settings = settings;
-		this.saveSettingsCallback = saveSettingsCallback;
 	}
 
 	updateSettings(newSettings: VaultFileRenamerSettings) {
@@ -60,16 +53,8 @@ export class RenamingService {
 			ext = file.name.substring(dotIndex); // includes dot
 		}
 
-		// Strip "Untitled 1", "Untitled 2" logic
-		let nameToProcess = nameNoExt;
-		const obsidianDuplicateRegex = /^(.*?)(\s\d+)$/;
-		const match = nameToProcess.match(obsidianDuplicateRegex);
-		if (match) {
-			nameToProcess = match[1];
-		}
-
 		const standardizedNameNoExt = this.applyRules(
-			nameToProcess,
+			nameNoExt,
 			file.stat.ctime
 		);
 		const standardizedExt = ext.toLowerCase();
@@ -186,9 +171,9 @@ export class RenamingService {
 					replacement.includes("{{DATE}}")
 				) {
 					const format = this.settings.dateFormat || "YYYY-MM-DD";
-					const dateStr = (moment as any)(
-						fileCreationTime || Date.now()
-					).format(format);
+					const dateStr = moment
+						.default(fileCreationTime || Date.now())
+						.format(format);
 					replacement = replacement.replace(/{{DATE}}/g, dateStr);
 				}
 

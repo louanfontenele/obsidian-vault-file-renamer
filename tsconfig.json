@@ -9,7 +9,6 @@
 		"skipLibCheck": true,
 		"outDir": ".",
 		"sourceMap": false,
-		"ignoreDeprecations": "6.0",
 		"noEmit": true
 	},
 	"include": ["**/*.ts"],

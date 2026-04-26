@@ -9,7 +9,6 @@ import {
 import VaultFileRenamerPlugin from "./main";
 import { FolderSuggest } from "./folder-suggest";
 import { FileSuggest } from "./file-suggest";
-import { RenamingRule } from "./types";
 
 export class VaultFileRenamerSettingTab extends PluginSettingTab {
 	plugin: VaultFileRenamerPlugin;
@@ -23,8 +22,6 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 		containerEl.addClass("vfr-settings-container");
-
-		containerEl.createEl("h2", { text: "Vault File Renamer – Settings" });
 
 		// -- Main Controls --
 		new Setting(containerEl)
@@ -57,7 +54,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 			);
 
 		// -- Extensions --
-		containerEl.createEl("h3", { text: "Extensions" });
+		new Setting(containerEl).setName("Extensions").setHeading();
 		new Setting(containerEl)
 			.setName("Target extensions (allow-list)")
 			.setDesc("Extensions to rename. Empty = all.")
@@ -75,7 +72,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Excluded extensions")
-			.setDesc("Extensions to NEVER rename.")
+			.setDesc("Extensions to never rename.")
 			.addText((text) => {
 				text.setPlaceholder("tmp, xml")
 					.setValue(
@@ -91,18 +88,18 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 			});
 
 		// -- Renaming Rules --
-		containerEl.createEl("h3", { text: "Renaming Rules" });
+		new Setting(containerEl).setName("Renaming rules").setHeading();
 		containerEl.createEl("p", {
-			text: "Rules are applied in order. You can use valid JavaScript Regex. Default is: lowercase -> NFD normalization -> My Rules.",
+			text: "Rules are applied in order. You can use valid JavaScript regex. Built-in steps run first: lowercase, then NFD normalization, then custom rules.",
 		});
 
 		const rulesContainer = containerEl.createDiv({ cls: "vfr-rules-list" });
 		this.renderRulesList(rulesContainer);
 
 		new Setting(containerEl).setName("Add new rule").addButton((btn) =>
-			btn.setButtonText("Add Rule").onClick(async () => {
+			btn.setButtonText("Add rule").onClick(async () => {
 				this.plugin.settings.rules.push({
-					name: "New Rule",
+					name: "New rule",
 					pattern: "",
 					replace: "",
 					active: true,
@@ -113,7 +110,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 		);
 
 		// -- Variables --
-		containerEl.createEl("h3", { text: "Variables" });
+		new Setting(containerEl).setName("Variables").setHeading();
 		new Setting(containerEl)
 			.setName("Enable {{DATE}} variable")
 			.setDesc(
@@ -138,10 +135,10 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 						this.plugin.settings.dateFormat = v;
 						await this.plugin.saveSettings();
 					})
-			);
+		);
 
 		// -- Blacklists --
-		containerEl.createEl("h3", { text: "Blacklists" });
+		new Setting(containerEl).setName("Blacklists").setHeading();
 
 		// Folder
 		const folderBlock = containerEl.createDiv();
@@ -214,7 +211,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 
 			// Active Toggle
 			const toggleDiv = row.createDiv({ cls: "vfr-toggle-compact" });
-			const toggle = new Setting(toggleDiv).addToggle((t) =>
+			new Setting(toggleDiv).addToggle((t) =>
 				t.setValue(rule.active).onChange(async (v) => {
 					rule.active = v;
 					await this.plugin.saveSettings();
@@ -246,7 +243,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 			};
 
 			// Arrow
-			row.createEl("span", { text: "→" });
+			row.createEl("span", { text: "->" });
 
 			// Replace
 			const replaceInput = row.createEl("input", {
@@ -261,7 +258,7 @@ export class VaultFileRenamerSettingTab extends PluginSettingTab {
 			};
 
 			// Delete
-			const delBtn = row.createEl("button", { text: "🗑️" });
+			const delBtn = row.createEl("button", { text: "Delete" });
 			delBtn.onclick = async () => {
 				this.plugin.settings.rules.splice(index, 1);
 				await this.plugin.saveSettings();

@@ -6,8 +6,8 @@ export const DEFAULT_SETTINGS: VaultFileRenamerSettings = {
 	targetExtensions: ["md"],
 	// When targetExtensions is empty (i.e., all), exclude none by default.
 	excludedExtensions: [],
-	// Avoid touching Obsidian internals by default.
-	blacklistedFolders: [".obsidian"],
+	// The current config folder is added on load from app.vault.configDir.
+	blacklistedFolders: [],
 	// No file-level blacklist by default.
 	blacklistedFiles: [],
 	// Default rules matching the original behavior:

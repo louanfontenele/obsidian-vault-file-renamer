@@ -1,15 +1,15 @@
-# Vault File Renamer 🔧🚀
+# Vault File Renamer
 
-**Vault File Renamer** is an Obsidian plugin that automatically standardizes the names of your vault files! It converts filenames to lowercase, removes accents, and ensures a consistent naming style that matches GitHub's conventions.
+**Vault File Renamer** automatically standardizes vault file and folder names. It converts names to lowercase, removes accents, applies configurable replacement rules, and preserves user-defined exceptions.
 
 ---
 
-## ✨ Features
+## Features
 
 -   **Automatic Renaming (toggleable):**  
      When enabled, standardizes names on file/folder **create** and **manual rename** events.
 -   **Consistent Naming Rules:**  
-     Lowercase, accents removed, spaces → dashes (`-`), and only `a–z`, `0–9`, `-`, `_`, `.` are allowed (others become `-`).
+     Lowercase and accent removal are built in. Custom regex rules run afterward and can be edited, disabled, removed, or reordered by changing the list.
 -   **Path Preservation:**  
      Keeps items in their original folders—no moves, just safe renames.
 -   **Allow-list for Extensions:**  
@@ -22,12 +22,14 @@
      Specific files are never renamed (great for **extensionless** files). Pick from suggestions and **one-click to add**.
 -   **Manual “Sweep” command:**  
      `Standardize everything now` runs an explicit pass over the entire vault (respects all blacklists and rules).
+-   **Duplicate safety:**  
+     If a target path already exists, the plugin appends a numeric suffix such as `-2`.
 -   **Safe defaults:**  
-     Starts **disabled**; `.obsidian` is blacklisted by default.
+     Starts **disabled**; the current vault configuration folder is blacklisted by default.
 
 ---
 
-## 📥 Installation
+## Installation
 
 1. **Clone or download** this repository.
 2. Run `npm install` in the plugin folder to install dependencies.
@@ -42,7 +44,7 @@
 
 ---
 
-## 🚀 Usage
+## Usage
 
 -   **Enable the toggle:**  
      In **Settings → Vault File Renamer**, turn on **Automatically rename**. From now on, new creations and manual renames will be standardized.
@@ -60,14 +62,14 @@
 -   **Run a full pass on demand:**  
      Use the command **“Standardize everything now”** to sweep the entire vault once, respecting all blacklists and extension rules.
 
--   **Duplicate safety:**  
-     The plugin checks for collisions and skips if a target name already exists.
+-   **Customize renaming rules:**  
+     Rules use JavaScript regular expressions. For example, keeping spaces requires disabling the default spaces-to-dashes rule and allowing whitespace in the special-character rule.
 
-Enjoy a tidier vault with standardized filenames! 🎉
+Enjoy a tidier vault with standardized filenames.
 
 ---
 
-## 🛠️ Development
+## Development
 
 To set up the development environment:
 
@@ -83,7 +85,14 @@ To set up the development environment:
     npm run watch
     ```
 
-3. **Build for Production:**
+3. **Lint and type-check:**
+
+    ```bash
+    npm run lint
+    npx tsc --noEmit
+    ```
+
+4. **Build for Production:**
 
     ```bash
     npm run build
@@ -93,13 +102,13 @@ Feel free to contribute and open issues if you find any bugs or have feature req
 
 ---
 
-## 🙏 Credits
+## Credits
 
-Developed with ❤️ by [Louan Fontenele](https://github.com/louanfontenele).  
+Developed by [Louan Fontenele](https://github.com/louanfontenele).  
 Inspired by the [Obsidian Sample Plugin](https://github.com/obsidianmd/obsidian-sample-plugin).
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

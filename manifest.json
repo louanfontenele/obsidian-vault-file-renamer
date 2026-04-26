@@ -1,9 +1,9 @@
 {
 	"id": "vault-file-renamer",
 	"name": "Vault File Renamer",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"minAppVersion": "0.15.0",
-	"description": "Standardizes names in your vault: lowercase, accents removed, spaces become hyphens, and invalid characters are converted. Settings include enable/disable, target extensions (allow-list), excluded extensions (when allow-list is empty), and folder blacklist.",
+	"description": "Standardizes vault file names with lowercase text, accent removal, custom replacement rules, extension filters, folder and file blacklists, and a manual sweep command.",
 	"author": "Louan Fontenele",
 	"authorUrl": "https://github.com/louanfontenele",
 	"isDesktopOnly": false

@@ -1,8 +1,7 @@
-import { App, AbstractInputSuggest } from "obsidian";
+import { App, AbstractInputSuggest, TFolder } from "obsidian";
 
 /**
  * Folder suggestions for settings inputs.
- * Uses the native AbstractInputSuggest (Obsidian ≥ 1.4.10).
  * Shows "/" (root) and all folders in the vault.
  * Optionally accepts an onSelect callback to handle immediate actions on pick.
  */
@@ -18,11 +17,26 @@ export class FolderSuggest extends AbstractInputSuggest<string> {
 	) {
 		super(app, inputEl);
 		this.inputEl = inputEl;
-		// Include root and all loaded folders.
-		// getAllFolders(includeRoot?: boolean) is available in recent API builds.
-		const vaultFolders = app.vault.getAllFolders(true).map((f) => f.path);
-		this.folders = Array.from(new Set<string>(["/"].concat(vaultFolders)));
+		this.folders = this.collectFolderPaths(app.vault.getRoot());
 		this.onSelectCb = onSelect;
+	}
+
+	private collectFolderPaths(root: TFolder): string[] {
+		const paths = new Set<string>(["/"]);
+		const visit = (folder: TFolder) => {
+			if (folder.path) {
+				paths.add(folder.path);
+			}
+
+			for (const child of folder.children) {
+				if (child instanceof TFolder) {
+					visit(child);
+				}
+			}
+		};
+
+		visit(root);
+		return Array.from(paths);
 	}
 
 	getSuggestions(inputStr: string): string[] {

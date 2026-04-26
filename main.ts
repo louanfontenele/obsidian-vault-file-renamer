@@ -14,8 +14,7 @@ export default class VaultFileRenamerPlugin extends Plugin {
 		// Initialize Service
 		this.renamingService = new RenamingService(
 			this.app,
-			this.settings,
-			this.saveSettings.bind(this)
+			this.settings
 		);
 
 		// Events
@@ -68,8 +67,8 @@ export default class VaultFileRenamerPlugin extends Plugin {
 		this.addRibbonIcon("dice", "Vault File Renamer", () => {
 			new Notice(
 				this.settings.enabled
-					? "Vault File Renamer is ACTIVE."
-					: "Vault File Renamer is DISABLED."
+					? "Vault File Renamer is active."
+					: "Vault File Renamer is disabled."
 			);
 		});
 
@@ -86,6 +85,14 @@ export default class VaultFileRenamerPlugin extends Plugin {
 		// Ensure rules exist if upgrading from old version
 		if (!this.settings.rules) {
 			this.settings.rules = DEFAULT_SETTINGS.rules;
+		}
+
+		const configDir = this.app.vault.configDir;
+		if (
+			configDir &&
+			!this.settings.blacklistedFolders.includes(configDir)
+		) {
+			this.settings.blacklistedFolders.push(configDir);
 		}
 	}
 
