@@ -12,6 +12,8 @@
      Lowercase and accent removal are built in. Custom regex rules run afterward and can be edited, disabled, removed, or reordered by changing the list.
 -   **Path Preservation:**  
      Keeps items in their original folders—no moves, just safe renames.
+-   **Link updates:**  
+     Uses Obsidian's file manager rename flow so internal links are updated when notes and folders are renamed.
 -   **Allow-list for Extensions:**  
      **Target extensions** (e.g., `md, canvas, png`). If set, only these are renamed.
 -   **Excluded Extensions (highest priority):**  

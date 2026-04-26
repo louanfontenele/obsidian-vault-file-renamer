@@ -22,6 +22,10 @@ export class RenamingService {
 		this.settings = newSettings;
 	}
 
+	private async renameItem(item: TAbstractFile, newPath: string) {
+		await this.app.fileManager.renameFile(item, newPath);
+	}
+
 	async standardizeAll() {
 		await this.standardizeAllFolders(this.app.vault.getRoot());
 		const files = this.app.vault.getFiles();
@@ -77,7 +81,7 @@ export class RenamingService {
 		this.renamingInProgress.add(uniquePath);
 
 		try {
-			await this.app.vault.rename(file, uniquePath);
+			await this.renameItem(file, uniquePath);
 		} catch (error) {
 			console.error(`Error renaming file ${oldPath}:`, error);
 		} finally {
@@ -107,7 +111,7 @@ export class RenamingService {
 		this.renamingInProgress.add(uniquePath);
 
 		try {
-			await this.app.vault.rename(folder, uniquePath);
+			await this.renameItem(folder, uniquePath);
 		} catch (error) {
 			console.error(`Error renaming folder ${folder.path}:`, error);
 		} finally {
