@@ -8,6 +8,8 @@ import {
 } from "obsidian";
 import { VaultFileRenamerSettings } from "./types";
 
+type MomentFactory = (input?: number) => { format: (format: string) => string };
+
 export class RenamingService {
 	private app: App;
 	private settings: VaultFileRenamerSettings;
@@ -24,6 +26,16 @@ export class RenamingService {
 
 	private async renameItem(item: TAbstractFile, newPath: string) {
 		await this.app.fileManager.renameFile(item, newPath);
+	}
+
+	private formatDate(timestamp: number | undefined, format: string): string {
+		const momentModule = moment as unknown as {
+			default?: MomentFactory;
+		};
+		const momentFactory =
+			momentModule.default ?? (moment as unknown as MomentFactory);
+
+		return momentFactory(timestamp || Date.now()).format(format);
 	}
 
 	async standardizeAll() {
@@ -175,9 +187,7 @@ export class RenamingService {
 					replacement.includes("{{DATE}}")
 				) {
 					const format = this.settings.dateFormat || "YYYY-MM-DD";
-					const dateStr = moment
-						.default(fileCreationTime || Date.now())
-						.format(format);
+					const dateStr = this.formatDate(fileCreationTime, format);
 					replacement = replacement.replace(/{{DATE}}/g, dateStr);
 				}
 

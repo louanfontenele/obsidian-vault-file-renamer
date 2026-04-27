@@ -1,7 +1,7 @@
 {
 	"id": "vault-file-renamer",
 	"name": "Vault File Renamer",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"minAppVersion": "0.15.0",
 	"description": "Standardizes vault file names with lowercase text, accent removal, custom replacement rules, extension filters, folder and file blacklists, and a manual sweep command.",
 	"author": "Louan Fontenele",

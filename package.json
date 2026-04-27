@@ -1,6 +1,6 @@
 {
 	"name": "vault-file-renamer",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Standardizes vault file names with lowercase text, accent removal, custom replacement rules, extension filters, folder and file blacklists, and a manual sweep command.",
 	"main": "main.js",
 	"scripts": {
